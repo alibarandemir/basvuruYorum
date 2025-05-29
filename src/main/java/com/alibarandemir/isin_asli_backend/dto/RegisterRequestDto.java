@@ -20,5 +20,5 @@ public class RegisterRequestDto {
     @NotBlank(message = "Şifre alanı boş bırakılamaz")
     private String password;
 
-    private MultipartFile photo;
+    private MultipartFile candidatePhoto;
 }

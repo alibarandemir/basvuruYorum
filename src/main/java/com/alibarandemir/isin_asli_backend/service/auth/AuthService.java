@@ -50,18 +50,19 @@ public class AuthService {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
             user.setRole(Role.USER);
 
-            if (request.getPhoto() != null && !request.getPhoto().isEmpty()) {
-                Map<String, String> uploadResult = cloudinaryService.uploadProfilePhoto(request.getPhoto());
+            if (request.getCandidatePhoto() != null && !request.getCandidatePhoto().isEmpty()) {
+                Map<String, String> uploadResult = cloudinaryService.uploadProfilePhoto(request.getCandidatePhoto());
                 user.setPhotoUrl(uploadResult.get("url"));
                 user.setPhotoPublicId(uploadResult.get("public_id"));
-                user.setPhotoName(request.getPhoto().getOriginalFilename());
+                user.setPhotoName(request.getCandidatePhoto().getOriginalFilename());
             }
 
             candidateRepository.save(user);
 
             String token = jwtUtil.generateToken(user.getEmail());
-            return ResponseDto.success(token, "Kayıt başarılı, token üretildi.");
+            return ResponseDto.success(token, "Kayıt başarılı");
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseDto.fail("Kayıt sırasında bir hata oluştu: " + e.getMessage());
         }
     }
@@ -93,9 +94,21 @@ public class AuthService {
         user.setResetTokenExpiration(LocalDateTime.now().plusMinutes(30)); // 30 dakika geçerli
         candidateRepository.save(user);
         emailService.sendResetPasswordEmail(user.getEmail(),token);
-        return ResponseDto.success(null,"Şifre sıfırlama bağlantısı e-posta ile gönderildi.");
+        return ResponseDto.success(null,"Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.");
 
 
+    }
+    public ResponseDto<String> resetPassword(String token,String newPassword){
+        Candidate user= candidateRepository.findByResetToken(token).orElseThrow(()->new RuntimeException("Geçersiz veya süresi dolmuş token"));
+        if(user.getResetTokenExpiration()==null|| user.getResetTokenExpiration().isBefore(LocalDateTime.now())){
+            return ResponseDto.fail("Süresi dolmuş token");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetToken(null);
+        user.setResetTokenExpiration(null);
+        candidateRepository.save(user);
+
+        return ResponseDto.success(null, "Şifre başarıyla güncellendi.");
     }
 }
 

@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface CandidateRepository extends JpaRepository<Candidate, Long> {
     Optional<Candidate> findByEmail(String email);
+    Optional<Candidate> findByResetToken(String token);
     long countByEnabled(boolean enabled);
 }

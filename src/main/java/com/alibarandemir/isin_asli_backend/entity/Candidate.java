@@ -1,6 +1,7 @@
 package com.alibarandemir.isin_asli_backend.entity;
 
 import com.alibarandemir.isin_asli_backend.enums.Role;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -39,6 +40,7 @@ public class Candidate extends BaseEntity implements UserDetails {
     @Column(name="photo_name")
     private String photoName;
 
+    @JsonProperty("candidatePhoto")
     @Column(name = "photo_url")
     private String photoUrl;
 

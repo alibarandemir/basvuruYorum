@@ -1,5 +1,8 @@
 package com.alibarandemir.isin_asli_backend.service;
 
+import com.alibarandemir.isin_asli_backend.controller.CandidateController;
+import com.alibarandemir.isin_asli_backend.dto.CandidateProfileDto;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -7,6 +10,8 @@ import com.alibarandemir.isin_asli_backend.dto.CandidateUpdateDto;
 import com.alibarandemir.isin_asli_backend.dto.ResponseDto;
 import com.alibarandemir.isin_asli_backend.entity.Candidate;
 import com.alibarandemir.isin_asli_backend.repository.CandidateRepository;
+
+import java.util.Optional;
 
 @Service
 public class CandidateService{
@@ -17,9 +22,22 @@ public class CandidateService{
         this.candidateRepository = candidateRepository;
     }
 
-    public ResponseDto<Candidate> getCandidateProfile(Long id) {
+    public ResponseDto<Candidate> getMe(HttpServletRequest req){
+        Long candidateId=(Long) req.getAttribute("candidateId");
+        if(candidateId==null){
+            return ResponseDto.fail("Tekrar giriş yapınız");
+        }
+        Candidate candidate = candidateRepository.findById(candidateId).orElseThrow(() -> new RuntimeException("Candidate not found"));
+
+        return ResponseDto.success(candidate,"Profil başarıyla getirildi");
+    }
+    @Transactional
+    public ResponseDto<CandidateProfileDto> getCandidateByUserId(HttpServletRequest request,Long id) {
+        Long candidateId=(Long)request.getAttribute("candidateId");
         Candidate candidate = candidateRepository.findById(id).orElseThrow(() -> new RuntimeException("Candidate not found"));
-        return ResponseDto.success(candidate,"Kullanıcı profili başarıyla getirildi");
+        boolean isOwnProfile=candidateId!=null&& candidate.getId().equals(candidateId);
+        CandidateProfileDto dto= new CandidateProfileDto(candidate.getId(),candidate.getName(),candidate.getSurname(),candidate.getCvFileUrl(),candidate.getPhotoUrl(),isOwnProfile);
+        return ResponseDto.success(dto,"Kullanıcı profili başarıyla getirildi");
     }
 
     @Transactional

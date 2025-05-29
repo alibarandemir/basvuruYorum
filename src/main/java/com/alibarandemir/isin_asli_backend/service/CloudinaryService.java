@@ -1,6 +1,7 @@
 package com.alibarandemir.isin_asli_backend.service;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,25 +18,21 @@ public class CloudinaryService {
 
     public Map<String, String> uploadProfilePhoto(MultipartFile file) throws IOException {
         Map<String, Object> options = ObjectUtils.asMap(
-            "folder", "profile_photos",
-            "transformation", new Object[]{
-                ObjectUtils.asMap(
-                    "width", 400,
-                    "height", 400,
-                    "crop", "fill",
-                    "gravity", "face",
-                    "format", "jpg",
-                    "quality", "auto"
-                )
-            }
+                "folder", "profile_photos",
+                "transformation", new Transformation()
+                        .width(400)
+                        .height(400)
+                        .crop("fill")
+                        .gravity("face")
+                        .fetchFormat("jpg")
+                        .quality("auto")
         );
 
-        Map<String, String> result = cloudinary.uploader()
-                .upload(file.getBytes(), options);
-        
+        Map result = cloudinary.uploader().upload(file.getBytes(), options);
+
         return Map.of(
-            "url", result.get("url"),
-            "public_id", result.get("public_id")
+                "url", (String) result.get("url"),
+                "public_id", (String) result.get("public_id")
         );
     }
 

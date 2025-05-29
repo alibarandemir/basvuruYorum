@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+
 public class AuthController {
 
     private final AuthService authenticationService;
@@ -35,6 +35,11 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<ResponseDto<String>> forgotPassword(@RequestParam String email) {
         ResponseDto<String> response = authenticationService.forgotPassword(email);
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<ResponseDto<String>> resetPassword(@RequestBody String token,@RequestBody String password){
+        ResponseDto<String> response = authenticationService.resetPassword(token,password);
         return ResponseEntity.ok(response);
     }
 }

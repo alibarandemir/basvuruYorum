@@ -20,6 +20,10 @@ public class CandidateController {
         this.candidateService = candidateService;
         this.jwtUtil = jwtUtil;
     }
+    @GetMapping("/me")
+    public ResponseEntity<ResponseDto<Candidate>> getMe(HttpServletRequest request){
+        return ResponseEntity.ok(candidateService.getMe(request));
+    }
 
     @PutMapping("/profile")
     public ResponseEntity<ResponseDto<Candidate>> updateCandidateProfile(
