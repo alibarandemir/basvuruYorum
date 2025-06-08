@@ -28,7 +28,7 @@ public class CandidateMiddleware implements HandlerInterceptor {
             Candidate candidate = candidateRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Candidate not found"));
             
-            //candidadate bilgisi requeste eklendi
+            // candidate bilgisi requeste eklendi
             request.setAttribute("candidateId", candidate.getId());
         }
         return true;
